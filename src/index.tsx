@@ -246,8 +246,8 @@ export function twux<
    *
    * returns a forwardRef component
    */
-  return forwardRef<React.ElementRef<K>, { className?: string }>(
-    function __telem__({ className, ...props }, ref): JSX.Element {
+  return forwardRef<React.ComponentRef<K>, { className?: string }>(
+    function __twux_component__({ className, ...props }, ref): JSX.Element {
       /**
        * We use `any` here. Should be safe because we are removing the keys
        * from `classifier` and the `classifier` are all props that are used
