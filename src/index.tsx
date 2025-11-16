@@ -31,7 +31,7 @@ export function mergeClassNamesIntoProps<T extends { className?: string }>(
 }
 
 /**
- * className and Tag
+ * className and tagName
  */
 export function twux<K extends keyof JSX.IntrinsicElements>(
   className: string,
@@ -45,7 +45,7 @@ export function twux<FCP extends Record<string, unknown>>(
   Component: React.FC<FCP>
 ): React.FC<FCP>;
 /**
- * className, classifier object and Tag
+ * className, classifier object and tagName
  */
 export function twux<
   K extends keyof JSX.IntrinsicElements,
@@ -67,7 +67,7 @@ export function twux<
   Tag: React.FC<FCP>
 ): React.FC<FCP & ConvertClassifierToProps<C>>;
 /**
- * className, classifier object, default values and Tag
+ * className, classifier object, default values and tagName
  */
 export function twux<
   K extends keyof JSX.IntrinsicElements,
@@ -199,27 +199,39 @@ export function twux<
     return classes;
   }
 
-  const JsxTag = isString(arg2)
+  // type Jsx
+
+  type JsxElement =
+    | {
+        type: "tag";
+        tag: keyof JSX.IntrinsicElements;
+      }
+    | {
+        type: "fn";
+        fn: React.FC;
+      }
+    | {
+        type: "undefined";
+      };
+
+  const tagName = isString(arg2)
     ? arg2
     : isString(arg3)
     ? arg3
     : isString(arg4)
     ? arg4
     : undefined;
-  const fc = isFunction(arg2)
+  const functionComponent = isFunction(arg2)
     ? arg2
     : isFunction(arg3)
     ? arg3
     : isFunction(arg4)
     ? arg4
     : undefined;
-  const jsxElem = JsxTag
-    ? ({ type: "tag", tag: JsxTag } as {
-        type: "tag";
-        tag: keyof JSX.IntrinsicElements;
-      })
-    : fc
-    ? ({ type: "fn", fn: fc } as { type: "fn"; fn: React.FC })
+  const jsxElem: JsxElement = tagName
+    ? { type: "tag", tag: tagName }
+    : functionComponent
+    ? ({ type: "fn", fn: functionComponent } as { type: "fn"; fn: React.FC })
     : ({ type: "undefined" } as { type: "undefined" });
   if (jsxElem.type === "undefined") {
     throw new Error(
@@ -259,15 +271,6 @@ export function twux<
       } as JSX.IntrinsicElements[K] & {
         ref?: React.Ref<JSX.IntrinsicElements[K]>;
       };
-
-      // Check if the function `fn` is provided
-      // if (fn) {
-      //   return fn(mergedProps)
-      // } else {
-      //   // Use the Tag component or element type as the component to render
-      //   const Component = Tag as React.ElementType
-      //   return <Component {...mergedProps} />
-      // }
 
       switch (jsxElem.type) {
         case "fn": {
