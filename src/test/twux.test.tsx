@@ -49,7 +49,30 @@ describe("twux", () => {
     });
   });
 
-  describe("single classifier", () => {
+  describe("single classifier with string values", () => {
+    it("should work with a classifier", () => {
+      const $button = twux(
+        "text-sm",
+        {
+          bold: "font-bold",
+          italic: "font-italic",
+        },
+        "button"
+      );
+      expect(<$button bold />).toRenderAs(
+        <button className="text-sm font-bold" />
+      );
+      expect(<$button italic />).toRenderAs(
+        <button className="text-sm font-italic" />
+      );
+      expect(<$button bold italic />).toRenderAs(
+        <button className="text-sm font-bold font-italic" />
+      );
+      expect(<$button />).toRenderAs(<button className="text-sm" />);
+    });
+  });
+
+  describe("single classifier with object values", () => {
     it("should work with a classifier", () => {
       const $button = twux(
         "text-sm",
@@ -66,6 +89,40 @@ describe("twux", () => {
       );
       expect(<$button variant="danger" />).toRenderAs(
         <button className="text-sm bg-red-500 text-white" />
+      );
+      // @ts-expect-error - variant is required
+      <$button />;
+    });
+  });
+
+  describe("single classifier with mixed string and object values", () => {
+    it("should work with a classifier", () => {
+      const $button = twux(
+        "text-sm",
+        {
+          bold: "font-bold",
+          italic: "font-italic",
+          variant: {
+            primary: "bg-blue-500 text-white",
+            danger: "bg-red-500 text-white",
+          },
+        },
+        "button"
+      );
+      expect(<$button bold variant="primary" />).toRenderAs(
+        <button className="text-sm font-bold bg-blue-500 text-white" />
+      );
+      expect(<$button italic variant="primary" />).toRenderAs(
+        <button className="text-sm font-italic bg-blue-500 text-white" />
+      );
+      expect(<$button bold italic variant="primary" />).toRenderAs(
+        <button className="text-sm font-bold font-italic bg-blue-500 text-white" />
+      );
+      expect(<$button variant="danger" />).toRenderAs(
+        <button className="text-sm bg-red-500 text-white" />
+      );
+      expect(<$button bold italic variant="danger" />).toRenderAs(
+        <button className="text-sm font-bold font-italic bg-red-500 text-white" />
       );
       // @ts-expect-error - variant is required
       <$button />;
@@ -105,6 +162,30 @@ describe("twux", () => {
       <$button variant="primary" />;
       // @ts-expect-error - variant is required
       <$button size="small" />;
+    });
+  });
+
+  describe("object classifier with default values", () => {
+    it("should work with a classifier", () => {
+      const $button = twux(
+        "text-sm",
+        {
+          variant: {
+            primary: "bg-blue-500 text-white",
+            danger: "bg-red-500 text-white",
+          },
+        },
+        {
+          variant: "primary",
+        },
+        "button"
+      );
+      expect(<$button />).toRenderAs(
+        <button className="text-sm bg-blue-500 text-white" />
+      );
+      expect(<$button variant="danger" />).toRenderAs(
+        <button className="text-sm bg-red-500 text-white" />
+      );
     });
   });
 

@@ -14,6 +14,19 @@ type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
  */
 export const tx = twMerge;
 
+type JsxElement =
+  | {
+      type: "tag";
+      tag: keyof JSX.IntrinsicElements;
+    }
+  | {
+      type: "fn";
+      fn: React.FC;
+    }
+  | {
+      type: "undefined";
+    };
+
 /**
  * Takes as it's first argument, a set of `props` from an element or function
  * component. We then merge the arguments which are class names into the
@@ -143,21 +156,21 @@ export function twux<
  */
 export function twux<
   K extends keyof JSX.IntrinsicElements,
-  FCP extends Record<string, unknown>,
+  FCProps extends Record<string, unknown>,
   C extends Record<string, string | Record<string, string>>
 >(
   className: string,
   arg2:
     | K
-    | React.FC<FCP>
+    | React.FC<FCProps>
     // optional classifier
     | C,
   arg3?:
     | K
-    | React.FC<FCP>
+    | React.FC<FCProps>
     // optional default values
     | Partial<ConvertClassifierToProps<C>>,
-  arg4?: K | React.FC<FCP>
+  arg4?: K | React.FC<FCProps>
 ): React.FC {
   const classifier = isRecord(arg2) ? arg2 : undefined;
   const defaultValues =
@@ -200,19 +213,6 @@ export function twux<
   }
 
   // type Jsx
-
-  type JsxElement =
-    | {
-        type: "tag";
-        tag: keyof JSX.IntrinsicElements;
-      }
-    | {
-        type: "fn";
-        fn: React.FC;
-      }
-    | {
-        type: "undefined";
-      };
 
   const tagName = isString(arg2)
     ? arg2
