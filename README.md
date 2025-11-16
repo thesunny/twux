@@ -1,7 +1,7 @@
 # Tailwind User Experience
 
-Twux is a simple and powerful way to build re-usable type-safe components with
-Tailwind in a 2.5 KB library.
+Twux is a simple and powerful way to build re-usable type-safe React components
+with Tailwind in a 2.5 KB library.
 
 ```tsx
 const MyButton = twux("text-white bg-blue-500", "button");
@@ -51,18 +51,23 @@ Automatically handles
 
 Everything is TypeScript first
 
-- Properly
 - Creates HTML based components with typed `props` based on the tag name like `button` so you don't have to remember to type `(props: React.ButtonHTMLAttributes<HTMLButtonElemeent>)`
-- Extracts your `props` from
+- Extracts and uses typed `props` from Function Components
 
-Includes powerful features to simplify Tailwind
+## Getting started
 
-- Define most components in one line
-- Supports HTML elements and function components
-- Uses tailwind-merge to handle className conflicts automatically
-- Supports multiple variants with optional default values
-- Supports togglable classNames
-- Handles forward refs
+Add `twux` to your project
+
+```bash
+# npm
+npm install twux
+
+# yarn
+yarn add twux
+
+# pnpm
+pnpm add twux
+```
 
 ## Basic Usage
 
@@ -84,7 +89,7 @@ The last argument is the `tagName` of a valid HTML element.
 
 `MyButton` is properly typed to have the props from a `button` element based on the `tagName`.
 
-The `MyButton` component can take its own `className`. Conflicting Tailwind classes will be automatically removed with `tailwind-merge`.
+The `MyButton` component can take its own `className` and conflicting Tailwind classes will be automatically removed.
 
 ```tsx
 function Component() {
@@ -145,7 +150,7 @@ function Form() {
 }
 ```
 
-If you don't want a type error on missing props, add defaults...
+If you don't want to require a variant prop, add defaults...
 
 ## Variants with Defaults
 
@@ -211,7 +216,7 @@ const MyParagraph = twux(
 );
 ```
 
-## Function Components
+## Function Component
 
 Sometimes you need more customization than an HTML element like a "button" or "div".
 
@@ -233,7 +238,7 @@ function Form() {
 `HelloButton` is typed to accept the props from the function component
 passed to `twux`.
 
-## Function Props with Props from an Element
+## Function Component with Element Props
 
 One weakness of adopting the props from the function component is that we the built in props on an Element.
 
@@ -260,17 +265,17 @@ In the example, we then add the `{ name: string }` that's custom for this functi
 
 The `{ name, ...props }` takes the `name` out from the rest of the props. The `props` are fed into `<button {...props}>`.
 
-## Organic Usage
+## Incremental Adoption
 
-The Twux library is designed to start simple and add complexity only when necessary.
+The Twux library is designed to start simple and add features only when necessary by allowing you to add them to the arguments.
 
-That's why the simplest usage is always...
+There are only two required arguments.
 
 ```tsx
 const Button = twux("text-white bg-blue-500", "button");
 ```
 
-At some point, we may want to add flags to turn some classNames on
+At some point, we may want to add variant flags to turn some classNames on
 
 ```tsx
 const Button = twux("bg-blue-500", { danger: "bg-red-500" }, "button");
@@ -319,53 +324,3 @@ const MyLib = {
   Input: twux('border', 'input)
 }
 ```
-
-## Building Component Libraries
-
-## Opinionated Practices for Building Libraries
-
-Here's some things I like to do
-
-## Getting started
-
-Add `twux` to your project
-
-```bash
-# npm
-npm install twux
-
-# yarn
-yarn add twux
-
-# pnpm
-pnpm add twux
-```
-
-## Basic Usage
-
-#### Basic Usage with ClassName only
-
-```tsx
-import { twux } from 'twux`
-
-// component with default classNames
-const Button = twux('text-white bg-blue-500', 'button')
-
-// function component
-const AlertButton = twux('text-white bg-blue-500', ({text, children, className}: {text: string; className: string, children: React.ReactNode}) => {
-  return <button onClick={() => alert(text)}>{children}</button>
-})
-
-```
-
-```tsx
-// ClassNames defined in twux are provided as defaults
-<Button>Click me</Button>
-<button className="text-white bg-blue-500">Click me</Button>
-
-// ClassNames passed in override, in a tailwind-safe way, the defaults
-<Button className="bg-red-500">Click me</Button>
-<button className="text-white bg-red-500">Click me</button>
-```
-
-####
