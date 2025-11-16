@@ -4,29 +4,44 @@ import { twMerge } from "tailwind-merge";
 import { isRecord, isString, isFunction, omit } from "./utils";
 import { ConvertClassifierToProps } from "./classifier-types";
 
+/**
+ * tx is a convenience export of tailwind-merge with a similar syntax to `cx` or
+ * `clsx`. We don't use `twMerge` to avoid possible conflicts.
+ */
+export { twMerge as tx } from "tailwind-merge";
+
 export type ElementProps<N extends React.ElementType | React.FC> =
   React.ComponentPropsWithoutRef<N>;
 
 type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-/**
- * tx is a convenience export of tailwind-merge with a similar syntax to `cx` or
- * `clsx`. We don't use `twMerge` to avoid possible conflicts.
- */
-export const tx = twMerge;
+type JsxElementTagName = { type: "tag-name"; tag: keyof JSX.IntrinsicElements };
+type JsxElementFunctionComponent = { type: "function-component"; fn: React.FC };
+type JsxElement = JsxElementTagName | JsxElementFunctionComponent;
 
-type JsxElement =
-  | {
-      type: "tag";
-      tag: keyof JSX.IntrinsicElements;
-    }
-  | {
-      type: "fn";
-      fn: React.FC;
-    }
-  | {
-      type: "undefined";
-    };
+/**
+ * Takes the arguments after the first in twux and returns a JsxElement.
+ *
+ * The return value is a JsxElement.
+ */
+function getJsxElementFromArgs(
+  ...args: (
+    | keyof JSX.IntrinsicElements
+    | React.FC
+    | Record<string, unknown> // could be a classifier object
+    | undefined
+  )[]
+): JsxElement {
+  for (const arg of args) {
+    if (isString(arg)) return { type: "tag-name", tag: arg };
+    if (isFunction(arg)) return { type: "function-component", fn: arg };
+  }
+  throw new Error(
+    "You must provide either a JSX tag (string) or a function component (function) as argument 2, 3, or 4"
+  );
+}
+
+type BaseClassifier = Record<string, Record<string, string> | string>;
 
 /**
  * Takes as it's first argument, a set of `props` from an element or function
@@ -36,7 +51,7 @@ type JsxElement =
  * The className that is actually on the props takes precedence over the class
  * names that are passed in.
  */
-export function mergeClassNamesIntoProps<T extends { className?: string }>(
+function mergeClassNamesIntoProps<T extends { className?: string }>(
   { className, ...props }: T,
   ...classes: Parameters<typeof twMerge>
 ): Omit<T, "className"> & { className: string } {
@@ -63,7 +78,7 @@ export function twux<FCProps extends Record<string, unknown>>(
  */
 export function twux<
   K extends keyof JSX.IntrinsicElements,
-  C extends Record<string, string | Record<string, string>>
+  C extends BaseClassifier
 >(
   className: string,
   classifier: C,
@@ -74,7 +89,7 @@ export function twux<
  */
 export function twux<
   FCProps extends Record<string, unknown>,
-  C extends Record<string, string | Record<string, string>>
+  C extends BaseClassifier
 >(
   className: string,
   classifier: C,
@@ -85,7 +100,7 @@ export function twux<
  */
 export function twux<
   K extends keyof JSX.IntrinsicElements,
-  C extends Record<string, string | Record<string, string>>,
+  C extends BaseClassifier,
   D extends Partial<ConvertClassifierToProps<C>>
 >(
   className: string,
@@ -112,7 +127,7 @@ export function twux<
  */
 export function twux<
   FCProps extends Record<string, unknown>,
-  C extends Record<string, string | Record<string, string>>,
+  C extends BaseClassifier,
   D extends Partial<ConvertClassifierToProps<C>>
 >(
   className: string,
@@ -155,29 +170,22 @@ export function twux<
  * - className, classifier, defaultClassifierValues, Tag | Function Component
  *
  */
-export function twux<
-  TagName extends keyof JSX.IntrinsicElements,
-  FCProps extends Record<string, unknown>,
-  Classifier extends Record<string, string | Record<string, string>>
->(
+export function twux<TagName extends keyof JSX.IntrinsicElements>(
   className: string,
-  arg2: TagName | React.FC<FCProps> | Classifier,
-  arg3?:
-    | TagName
-    | React.FC<FCProps>
-    | Partial<ConvertClassifierToProps<Classifier>>,
-  arg4?: TagName | React.FC<FCProps>
+  arg2: TagName | React.FC | BaseClassifier,
+  arg3?: TagName | React.FC | Partial<ConvertClassifierToProps<BaseClassifier>>,
+  arg4?: TagName | React.FC
 ): React.FC {
-  const classifier = isRecord(arg2) ? arg2 : undefined;
-  const defaultValues =
-    classifier && isRecord(arg3)
+  const maybeClassifier = isRecord(arg2) ? arg2 : undefined;
+  const maybeDefaultValues =
+    maybeClassifier && isRecord(arg3)
       ? arg3
-      : ({} as Partial<ConvertClassifierToProps<Classifier>>);
+      : ({} as Partial<ConvertClassifierToProps<BaseClassifier>>);
 
-  function classify(props: Record<string, unknown>): string[] {
-    const classes: string[] = [className];
-    if (!classifier) return classes;
-    Object.entries(classifier).forEach(([key, value]) => {
+  function classify(incomingProps: Record<string, unknown>): string[] {
+    const classNames: string[] = [className];
+    if (!maybeClassifier) return classNames;
+    for (const [key, value] of Object.entries(maybeClassifier)) {
       if (isString(value)) {
         /**
          * If the use passed in a prop that matches the key, then add the
@@ -186,54 +194,34 @@ export function twux<
          * so push the value to the classes array.
          */
         if (
-          key in props
-            ? props[key]
-            : (defaultValues as Record<string, true>)[key]
+          key in incomingProps ? incomingProps[key] : maybeDefaultValues[key]
         ) {
-          classes.push(value);
-          return;
+          classNames.push(value);
         }
-      } else if (isRecord(value)) {
+        continue;
+      }
+      if (isRecord(value)) {
         Object.entries(value).forEach(([k, v]) => {
           if (
-            key in props
-              ? props[key] === k
-              : (defaultValues as Record<string, string>)[key] === k
+            key in incomingProps
+              ? incomingProps[key] === k
+              : maybeDefaultValues[key] === k
           ) {
-            classes.push(v);
+            classNames.push(v);
           }
         });
+        continue;
       }
-    });
-    return classes;
+      throw new Error(
+        `Invalid classifier value: ${value}. Classifier values must be a string or an object with string keys.`
+      );
+    }
+    return classNames;
   }
 
   // type Jsx
 
-  const tagName = isString(arg2)
-    ? arg2
-    : isString(arg3)
-    ? arg3
-    : isString(arg4)
-    ? arg4
-    : undefined;
-  const functionComponent = isFunction(arg2)
-    ? arg2
-    : isFunction(arg3)
-    ? arg3
-    : isFunction(arg4)
-    ? arg4
-    : undefined;
-  const jsxElem: JsxElement = tagName
-    ? { type: "tag", tag: tagName }
-    : functionComponent
-    ? ({ type: "fn", fn: functionComponent } as { type: "fn"; fn: React.FC })
-    : ({ type: "undefined" } as { type: "undefined" });
-  if (jsxElem.type === "undefined") {
-    throw new Error(
-      "You must provide either a JSX tag (string) or a function component (function) as argument 2, 3, or 4"
-    );
-  }
+  const jsxElem = getJsxElementFromArgs(arg2, arg3, arg4);
 
   /**
    * We specify the `props` as `className?: string` and ignoring the other
@@ -244,24 +232,17 @@ export function twux<
    */
   return forwardRef<React.ComponentRef<TagName>, { className?: string }>(
     function __twux_component__({ className, ...props }, ref): JSX.Element {
-      /**
-       * We use `any` here. Should be safe because we are removing the keys
-       * from `classifier` and the `classifier` are all props that are used
-       * for processing the classifier. These should NOT be included in the
-       * elementProps.
-       */
-      const elementProps = classifier
-        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          omit(props, Object.keys(classifier) as any)
-        : props;
+      const elementPropsWithoutClassNameAndClassifierKeys = omit(props, [
+        "className",
+        ...(maybeClassifier ? Object.keys(maybeClassifier) : []),
+      ]);
 
       // Merge props with default class names
       const mergedProps = {
         ...mergeClassNamesIntoProps(
-          elementProps as { className?: string; [key: string]: unknown },
-          //  JSX.IntrinsicElements[K], // Spread the rest of the props
+          elementPropsWithoutClassNameAndClassifierKeys,
           classify(props), // Apply default classes first
-          className // Append className from props last
+          className // Append className from props last to override
         ),
         ref, // Attach the forwarded ref here
       } as JSX.IntrinsicElements[TagName] & {
@@ -269,11 +250,11 @@ export function twux<
       };
 
       switch (jsxElem.type) {
-        case "fn": {
+        case "function-component": {
           const FunctionComponent = jsxElem.fn;
           return <FunctionComponent {...mergedProps} />;
         }
-        case "tag": {
+        case "tag-name": {
           /**
            * We need to type cast `jsxElem.tag` to `React.ElementType` because
            * `jsxElem.tag` can be an SVG type and that causes type issues. There

@@ -15,6 +15,13 @@ describe("twux", () => {
         <div className="bg-blue-500" />
       );
     });
+
+    it("should pass through other props to the element", () => {
+      const $div = twux("bg-red-500", "div");
+      expect(<$div data-testid="test-id" />).toRenderAs(
+        <div data-testid="test-id" className="bg-red-500" />
+      );
+    });
   });
 
   describe("default class names with different elements", () => {

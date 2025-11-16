@@ -10,11 +10,20 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export function omit<T extends Record<string, unknown>, K extends keyof T>(
+export function omit<T extends Record<string, unknown>>(
   obj: T,
-  keysToOmit: K[]
-): Omit<T, K> {
+  keysToOmit: string[]
+): Record<string, unknown> {
   return Object.fromEntries(
-    Object.entries(obj).filter(([key]) => !keysToOmit.includes(key as K))
-  ) as Omit<T, K>;
+    Object.entries(obj).filter(([key]) => !keysToOmit.includes(key))
+  );
+}
+
+export function pick<T extends Record<string, unknown>>(
+  obj: T,
+  keysToPick: string[]
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key]) => keysToPick.includes(key))
+  );
 }
