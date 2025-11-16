@@ -53,10 +53,10 @@ export function twux<K extends keyof JSX.IntrinsicElements>(
 /**
  * className and Function Component
  */
-export function twux<FCP extends Record<string, unknown>>(
+export function twux<FCProps extends Record<string, unknown>>(
   className: string,
-  Component: React.FC<FCP>
-): React.FC<FCP>;
+  Component: React.FC<FCProps>
+): React.FC<FCProps>;
 /**
  * className, classifier object and tagName
  */
@@ -72,13 +72,13 @@ export function twux<
  * className, classifier object and Function Component
  */
 export function twux<
-  FCP extends Record<string, unknown>,
+  FCProps extends Record<string, unknown>,
   C extends Record<string, string | Record<string, string>>
 >(
   className: string,
   classifier: C,
-  Tag: React.FC<FCP>
-): React.FC<FCP & ConvertClassifierToProps<C>>;
+  Tag: React.FC<FCProps>
+): React.FC<FCProps & ConvertClassifierToProps<C>>;
 /**
  * className, classifier object, default values and tagName
  */
@@ -110,16 +110,16 @@ export function twux<
  * className, classifier object, default values and FunctionComponent
  */
 export function twux<
-  FCP extends Record<string, unknown>,
+  FCProps extends Record<string, unknown>,
   C extends Record<string, string | Record<string, string>>,
   D extends Partial<ConvertClassifierToProps<C>>
 >(
   className: string,
   classifier: C,
   defaultValues: D,
-  Tag: React.FC<FCP>
+  Tag: React.FC<FCProps>
 ): React.FC<
-  FCP &
+  FCProps &
     /**
      * If defaultValues are provided, we need to make the provided defaultValues
      * optional
@@ -134,7 +134,7 @@ export function twux<
     >
 >;
 /**
- * The arguments for telem are as follows:
+ * The arguments for twux are as follows:
  *
  * - className: This is always required
  * - classifier?: An optional object that represents variants of the JSX Element
@@ -155,28 +155,23 @@ export function twux<
  *
  */
 export function twux<
-  K extends keyof JSX.IntrinsicElements,
+  TagName extends keyof JSX.IntrinsicElements,
   FCProps extends Record<string, unknown>,
-  C extends Record<string, string | Record<string, string>>
+  Classifier extends Record<string, string | Record<string, string>>
 >(
   className: string,
-  arg2:
-    | K
-    | React.FC<FCProps>
-    // optional classifier
-    | C,
+  arg2: TagName | React.FC<FCProps> | Classifier,
   arg3?:
-    | K
+    | TagName
     | React.FC<FCProps>
-    // optional default values
-    | Partial<ConvertClassifierToProps<C>>,
-  arg4?: K | React.FC<FCProps>
+    | Partial<ConvertClassifierToProps<Classifier>>,
+  arg4?: TagName | React.FC<FCProps>
 ): React.FC {
   const classifier = isRecord(arg2) ? arg2 : undefined;
   const defaultValues =
     classifier && isRecord(arg3)
       ? arg3
-      : ({} as Partial<ConvertClassifierToProps<C>>);
+      : ({} as Partial<ConvertClassifierToProps<Classifier>>);
 
   function classify(props: Record<string, unknown>): string[] {
     const classes: string[] = [className];
@@ -246,7 +241,7 @@ export function twux<
    *
    * returns a forwardRef component
    */
-  return forwardRef<React.ComponentRef<K>, { className?: string }>(
+  return forwardRef<React.ComponentRef<TagName>, { className?: string }>(
     function __twux_component__({ className, ...props }, ref): JSX.Element {
       /**
        * We use `any` here. Should be safe because we are removing the keys
@@ -268,8 +263,8 @@ export function twux<
           className // Append className from props last
         ),
         ref, // Attach the forwarded ref here
-      } as JSX.IntrinsicElements[K] & {
-        ref?: React.Ref<JSX.IntrinsicElements[K]>;
+      } as JSX.IntrinsicElements[TagName] & {
+        ref?: React.Ref<JSX.IntrinsicElements[TagName]>;
       };
 
       switch (jsxElem.type) {
