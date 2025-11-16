@@ -2,6 +2,7 @@
 import React, { forwardRef, type JSX } from "react";
 import { twMerge } from "tailwind-merge";
 import { isRecord, isString, isFunction, omit } from "./utils";
+import { ConvertClassifierToProps } from "./classifier-types";
 
 export type ElementProps<N extends React.ElementType | React.FC> =
   React.ComponentPropsWithoutRef<N>;
@@ -286,39 +287,3 @@ export function twux<
     }
   );
 }
-
-export type ClassifierValueBaseType = string | Record<string, string>;
-
-export type ConvertClassifierValueToPropValue<
-  T extends string | Record<string, string>
-> = T extends
-  | string
-  | { true: string }
-  | { false: string }
-  | { true: string; false: string }
-  ? /**
-     * If the value is a string or an object with a `true` or `false` key, the
-     * prop is an optional boolean which is specified as `boolean | undefined`
-     * which is later turned into an optional boolean when converted to an
-     * object property.
-     */
-    boolean | undefined
-  : T extends Record<infer K, string>
-  ? /**
-     * If the value is an object with string keys, then the acceptable values
-     * for the prop are the keys of the object.
-     */
-    K
-  : never;
-
-type MakeUndefinedOptional<T> = {
-  [K in keyof T as undefined extends T[K] ? K : never]?: T[K];
-} & {
-  [K in keyof T as undefined extends T[K] ? never : K]: T[K];
-};
-
-export type ConvertClassifierToProps<
-  T extends Record<string, ClassifierValueBaseType>
-> = MakeUndefinedOptional<{
-  [K in keyof T]: ConvertClassifierValueToPropValue<T[K]>;
-}>;
