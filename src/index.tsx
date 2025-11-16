@@ -223,7 +223,7 @@ export function twux<
     : ({ type: "undefined" } as { type: "undefined" });
   if (jsxElem.type === "undefined") {
     throw new Error(
-      "You must provide either a JSX tag (string) or a function component (function) as argument 2 or 3"
+      "You must provide either a JSX tag (string) or a function component (function) as argument 2, 3, or 4"
     );
   }
 
