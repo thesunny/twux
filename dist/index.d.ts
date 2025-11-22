@@ -32,6 +32,7 @@ type ConvertClassifierToProps<T extends Record<string, ClassifierValueBaseType>>
 }>;
 
 type ElementProps<N extends React.ElementType | React.FC> = React.ComponentPropsWithoutRef<N>;
+type HTMLElementProps<N extends React.ElementType | React.FC> = React.ComponentPropsWithoutRef<N>;
 type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 type BaseClassifier = Record<string, Record<string, string> | string>;
 /**
@@ -79,4 +80,4 @@ MakeOptional<ConvertClassifierToProps<C>,
  */
 keyof ConvertClassifierToProps<C> & keyof D>>;
 
-export { type ElementProps, twux };
+export { type ElementProps, type HTMLElementProps, twux };
