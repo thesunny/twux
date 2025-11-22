@@ -13,6 +13,9 @@ export { twMerge as tx } from "tailwind-merge";
 export type ElementProps<N extends React.ElementType | React.FC> =
   React.ComponentPropsWithoutRef<N>;
 
+export type HTMLElementProps<N extends React.ElementType | React.FC> =
+  React.ComponentPropsWithoutRef<N>;
+
 type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 type JsxElementTagName = { type: "tag-name"; tag: keyof JSX.IntrinsicElements };
