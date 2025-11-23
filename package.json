@@ -26,6 +26,8 @@
     "-- build": "# build",
     "build": "tsup",
     "build:watch": "tsup --watch",
+    "-- release": "# release",
+    "release": "release-it",
     "-- test": "# test",
     "test": "vitest run",
     "test:watch": "vitest ",
@@ -40,6 +42,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "react-dom": "^19.2.0",
+    "release-it": "^19.0.6",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.9"
