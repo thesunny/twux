@@ -11,60 +11,34 @@ See the [Twux Documentation and Website](https://twux.vercel.app/) to learn more
 const Button = twux("text-white bg-blue-500", "button");
 ```
 
-Examples:
-
-<table style="width: 100%;">
-<thead>
-<tr>
-<th style="width: 50%;">Usage</th>
-<th style="width: 50%;">Generates</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
+Example 1:
 
 ```tsx
 <Button>
   Click me!
 </Button>
-```
 
-</td>
-<td>
+// Outputs
 
-```tsx
 <button className="text-white bg-blue-500">
   Click me!
 </button>
 ```
 
-</td>
-</tr>
-
-<tr>
-<td>
+Example 2:
 
 ```tsx
 <Button className="bg-red-500">
   Click me!
 </Button>
-```
 
-</td>
-<td>
+// Outputs
 
-```tsx
 <button className="text-white bg-red-500">
   Click me!
 </button>
 ```
 
-</td>
-</tr>
-
-</tbody>
-</table>
 
 ## Variants
 
