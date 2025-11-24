@@ -8,6 +8,8 @@ See the [Twux Documentation and Website](https://twux.vercel.app/) to learn more
 ## Basic Usage
 
 ```tsx
+import { twux } from "twux";
+
 const Button = twux("text-white bg-blue-500", "button");
 ```
 
@@ -64,63 +66,35 @@ const VariantButton = twux(
 );
 ```
 
-Examples:
-
-<table style="width: 100%;">
-<thead>
-<tr>
-<th style="50%;">Usage</th>
-<th style="50%;">Generates</th>
-</tr>
-</hthead>
-<tbody>
-
-<tr>
-<td>
+Example 1:
 
 ```tsx
 <VariantButton color="primary" size="md">
   Medium Primary Button
 </VariantButton>
-```
 
-</td>
-<td>
+// Outputs
 
-```tsx
 <button className="bg-blue-500 text-base">
   Medium Primary Button
 </button>
 ```
 
-</td>
-</tr>
-
-<tr>
-<td>
+Example 2:
 
 ```tsx
 <VariantButton color="gray" size="sm">
   Small Gray Button
 </VariantButton>
-```
 
-</td>
-<td>
+// Outputs
 
-```tsx
 <button className="bg-gray-500 text-sm">
   Small Gray Button
 </button>
 ```
 
-</td>
-</tr>
-
-</tbody>
-</table>
-
-Twux also support [default values for variants](#use-content-default-values).
+Twux also support [default values for variants](https://twux.vercel.app/variants#default-values).
 
 ## Boolean Variants
 
@@ -137,59 +111,33 @@ const BooleanButton = twux(
 );
 ```
 
-Examples:
-
-<table style="width: 100%;">
-<thead>
-<tr>
-<th style="width: 50%;">Usage</th>
-<th style="width: 50%;">Generates</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
+Example 1:
 
 ```tsx
 <BooleanButton bold>
   Bold Button
 </BooleanButton>
-```
 
-</td>
-<td>
+// Outputs
 
-
-```tsx
 <button className="font-bold">
   Bold Button
 </button>
 ```
 
-</td>
-</tr>
-<tr>
-<td>
+Example 2:
 
 ```tsx
 <BooleanButton italic>
   Italic Button
 </BooleanButton>
-```
 
-</td>
-<td>
+// Outputs
 
-```tsx
 <button className="italic">
   Bold Button
 </button>
 ```
-
-</td>
-</tr>
-</tbody>
-</table>
 
 Note: Boolean variants and option variants can be mixed and matched.
 
@@ -208,5 +156,24 @@ const Chip = twux(
 );
 ```
 
-Examples:
+Example:
 
+```tsx
+<Chip text="This is a chip" />
+
+// Outputs
+
+<span className="text-xs bg-orange-600 text-white rounded-full px-2 py-1 inline-block">
+  This is a chip
+</span>
+```
+
+
+## Documentation
+
+[Read the Twux documentation](https://twux.vercel.app/) to learn more about
+
+- [Geting Started](https://twux.vercel.app/getting-started)
+- [Default Values](https://twux.vercel.app/variants#default-values)
+- [Building Libraries](https://twux.vercel.app/libraries)
+- [Frequently Asked Questions](https://twux.vercel.app/faq)
